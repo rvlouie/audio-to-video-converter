@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
@@ -10,7 +10,6 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 function createWindow() {
 
-  console.log('🟢 [main] createWindow() called');
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -20,8 +19,8 @@ function createWindow() {
     }
   });
 
-
   if (isDev) {
+    console.log('🟢 [main] Loading dev URL');
     // Dev: point at Vite’s dev server
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
@@ -29,9 +28,15 @@ function createWindow() {
     // Prod: load the built index.html
     win.loadFile(path.join(__dirname, '../dist/index.html'));
   }
+  win.once('ready-to-show', () => {
+    win.show();
+  });
+
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow()
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
@@ -71,4 +76,32 @@ ipcMain.handle('convert-files', async (event, { files, template }) => {
     }
   }
   return results;
+});
+
+// paths to defaults and user‐saved templates
+const defaultTemplatesPath = path.join(__dirname, '../templates/templates.json');
+const userTemplatesPath = path.join(app.getPath('userData'), 'templates.json');
+
+// helper to merge defaults + user templates
+function loadTemplates() {
+  let defaults = [];
+  try { defaults = JSON.parse(fs.readFileSync(defaultTemplatesPath, 'utf-8')); } catch { }
+  let userTpls = [];
+  try { userTpls = JSON.parse(fs.readFileSync(userTemplatesPath, 'utf-8')); } catch { }
+  return [...defaults, ...userTpls];
+}
+
+// return all templates
+ipcMain.handle('get-templates', () => {
+  return loadTemplates();
+});
+
+// append a new template to userTemplatesPath and return updated list
+ipcMain.handle('save-template', (event, template) => {
+  const userTpls = fs.existsSync(userTemplatesPath)
+    ? JSON.parse(fs.readFileSync(userTemplatesPath, 'utf-8'))
+    : [];
+  userTpls.push(template);
+  fs.writeFileSync(userTemplatesPath, JSON.stringify(userTpls, null, 2));
+  return loadTemplates();
 });
