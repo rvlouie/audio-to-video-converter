@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Hidden for Figma",
+    "color": "black",
+    "size": "4x4",
+    "audioExt": "wav",
+    "outputFolder": "hidden_for_figma"
+  },
+  {
+    "name": "YouTube Default",
+    "color": "black",
+    "size": "1280x720",
+    "audioExt": "mp3",
+    "outputFolder": "youtube_videos"
+  },
+  {
+    "name": "Instagram Reel",
+    "color": "white",
+    "size": "1080x1350",
+    "audioExt": "mp3",
+    "outputFolder": "insta_reels"
+  },
+]
