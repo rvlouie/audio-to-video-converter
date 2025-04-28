@@ -3,11 +3,14 @@ const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
 const fs = require('fs');
+const isDev = !app.isPackaged;
 
 // Set the path to the static ffmpeg binary
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 function createWindow() {
+
+  console.log('🟢 [main] createWindow() called');
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -17,9 +20,13 @@ function createWindow() {
     }
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+
+  if (isDev) {
+    // Dev: point at Vite’s dev server
+    win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
   } else {
+    // Prod: load the built index.html
     win.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 }
