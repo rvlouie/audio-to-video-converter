@@ -29,10 +29,16 @@
     "mac": {
       "target": "dmg"
     },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**",
+      "templates/**"
+    ],
     "files": [
       "electron/**/*",     
       "dist/**/*",          
       "node_modules/**/*",
+      "templates/**/*",
       "package.json"
     ]
   }

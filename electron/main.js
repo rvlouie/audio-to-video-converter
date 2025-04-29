@@ -1,11 +1,21 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegStatic = require('ffmpeg-static');
 const fs = require('fs');
 const isDev = !app.isPackaged;
 
+function resolveUnpacked(p) {
+  // e.g. file:///.../app.asar/...  →  file:///.../app.asar.unpacked/...
+  if (p.includes('app.asar')) {
+    return p.replace('app.asar', 'app.asar.unpacked');
+  }
+  return p;
+}
+
 // Set the path to the static ffmpeg binary
+let ffmpegPath = ffmpegStatic;
+ffmpegPath = resolveUnpacked(ffmpegPath);
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 function createWindow() {
@@ -78,21 +88,46 @@ ipcMain.handle('convert-files', async (event, { files, template }) => {
 });
 
 // paths to defaults and user‐saved templates
-const defaultTemplatesPath = path.join(__dirname, '../templates/templates.json');
-const userTemplatesPath = path.join(app.getPath('userData'), 'templates.json');
-
-// helper to merge defaults + user templates
-function loadTemplates() {
-  let defaults = [];
-  try { defaults = JSON.parse(fs.readFileSync(defaultTemplatesPath, 'utf-8')); } catch { }
-  let userTpls = [];
-  try { userTpls = JSON.parse(fs.readFileSync(userTemplatesPath, 'utf-8')); } catch { }
-  return [...defaults, ...userTpls];
+function getDefaultTemplatesPath() {
+  if (app.isPackaged) {
+    // In production, your unpacked files live at <Resources>/app.asar.unpacked/...
+    return path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'templates',
+      'templates.json'
+    );
+  } else {
+    // In dev, they’re right next to your electron folder
+    return path.join(__dirname, '../templates/templates.json');
+  }
 }
+
+const userTemplatesPath = path.join(app.getPath('userData'), 'templates.json');
 
 // return all templates
 ipcMain.handle('get-templates', () => {
-  return loadTemplates();
+  const defaultPath = getDefaultTemplatesPath();
+  console.log('🔍 Loading default templates from', defaultPath);
+
+  let defaults = [];
+  try {
+    defaults = JSON.parse(fs.readFileSync(defaultPath, 'utf-8'));
+  } catch (err) {
+    console.error('❌ Cannot read default templates:', err);
+  }
+
+  const userPath = path.join(app.getPath('userData'), 'templates.json');
+  let userTpls = [];
+  try {
+    userTpls = JSON.parse(fs.readFileSync(userPath, 'utf-8'));
+  } catch (e) {
+    // ignore if missing
+  }
+
+  const all = [...defaults, ...userTpls];
+  console.log('📦 Returning', all.length, 'templates');
+  return all;
 });
 
 // append a new template to userTemplatesPath and return updated list
