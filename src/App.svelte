@@ -18,7 +18,6 @@
 
   // 1️⃣ onMount → fetch templates via IPC
   onMount(async () => {
-    console.log("🟢 [App] onMount");
     try {
       const tpls = await window.electronAPI.getTemplates();
       templates = [...tpls, { name: "Custom...", custom: true }];
@@ -51,6 +50,7 @@
       msgs = results.map((r) =>
         r.success ? `✅ ${r.file}` : `❌ ${r.file}: ${r.error}`,
       );
+      dropped = []
     } catch (err) {
       console.error("⚠️ [App] conversion error:", err);
       msgs = [`❌ Unexpected error: ${err.message}`];
@@ -68,18 +68,21 @@
   on:dragover|preventDefault
 >
   {#if dropped.length}
-    <h4>Dropped Files:</h4>
-    <ul>
-      {#each dropped as f}<li>{f}</li>{/each}
-    </ul>
+    <h4>{dropped.length} audio files ready to convert</h4>
+  {:else if msgs.length}
+    <h4>Files converted!</h4>
+    <p>Drag more audio files to keep on convertin'.</p>
   {:else}
-    <p>Drag & drop files/folders here</p>
+    <h4>Drag & drop audio files here to get convertin'.</h4>
   {/if}
 </div>
 
+
+
+<div class="main-functionality">
 <!-- Template Selector -->
 {#if templates.length}
-  <div>
+  <div class="form-element">
     <label for="tpl">Template:</label>
     <select id="tpl" on:change={chooseTpl} bind:value={selected.name}>
       {#each templates as tpl}
@@ -90,15 +93,30 @@
 {:else}
   <p><em>No templates loaded yet.</em></p>
 {/if}
-
 <!-- Custom Template Form -->
 {#if isCustom}
-  <div class="custom-form">
-    <input placeholder="Name" bind:value={customName} />
-    <input placeholder="Background" bind:value={color} />
-    <input placeholder="Size" bind:value={size} />
-    <input placeholder="Audio Ext" bind:value={audioExt} />
-    <input placeholder="Output Folder" bind:value={outputFolder} />
+  <div class="parameters">
+    <div class="form-element">
+      <label>Name</label>
+      <input placeholder="Name" bind:value={customName} />
+    </div>
+    <div class="form-element">
+      <label>Background Color</label>
+      <input placeholder="Background" bind:value={color} />
+    </div>
+    <div class="form-element">
+      <label>Size</label>
+      <input placeholder="Size" bind:value={size} />
+    </div>
+    <div class="form-element">
+      <label>Audio File Type</label>
+      <input placeholder="Audio Ext" bind:value={audioExt} />
+    </div>
+    <div class="form-element">
+      <label>Output Folder Name</label>
+      <input placeholder="Output Folder" bind:value={outputFolder} />
+    </div>
+
     <button
       on:click={async () => {
         // save & reload
@@ -119,34 +137,113 @@
     </button>
   </div>
 {:else}
-  <div>
-    <span>{selected.name}</span><span>{selected.color}</span><span
-      >{selected.size}</span
-    ><span>{selected.outputFolder}</span>
+  <div class="parameters">
+    <div class="form-element">
+      <label>Name</label>
+      <input bind:value={selected.name} />
+    </div>
+    <div class="form-element">
+      <label>Background Color</label>
+      <input bind:value={selected.color} />
+    </div>
+    <div class="form-element">
+      <label>Size</label>
+      <input bind:value={selected.size} />
+    </div>
+    <div class="form-element">
+      <label>Audio File Type</label>
+      <input bind:value={selected.audioExt} />
+    </div>
+    <div class="form-element">
+      <label>Output Folder Name</label>
+      <input bind:value={selected.outputFolder} />
+    </div>
   </div>
 {/if}
 
 <!-- Convert Button -->
-<button on:click={convert} disabled={processing || !dropped.length}>
+<button class="convert-button" on:click={convert} disabled={processing || !dropped.length}>
   {processing ? "Processing…" : "Convert to MP4"}
 </button>
 
+</div>
+
 <!-- Results -->
-{#if msgs.length}
+<!-- {#if msgs.length}
   <h4>Results:</h4>
   <ul>
     {#each msgs as m}<li>{m}</li>{/each}
   </ul>
-{/if}
+{/if} -->
 
 <style>
+  
+  :global(body) {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    margin: 1rem;
+    justify-content: center;
+    height: calc(100vh - 2rem);
+    display: flex;
+    align-items: center;
+  }
+
+  :global(body #app) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
   .dropzone {
     border: 2px dashed #ccc;
-    padding: 2em;
+    padding: 1rem;
     text-align: center;
+    border-radius: 4px;
+    min-width: 334px;
+    width: 100%;
   }
-  .custom-form input {
+
+  .main-functionality {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+  }
+
+  .parameters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .form-element input, .form-element select {
     display: block;
-    margin: 0.5em 0;
+    padding: 0.5rem;
+
   }
+
+  .form-element {
+    display: flex;
+    flex-direction: column;
+    gap: 0.33rem;
+  }
+
+  .form-element label {
+    font-size: 1rem;
+  }
+
+  .convert-button {
+    padding: 0.75rem;
+    background-color: #0033FF;
+    color: #fff;
+    border: none; 
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
+  .convert-button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+
 </style>
