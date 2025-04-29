@@ -93,6 +93,9 @@
 {:else}
   <p><em>No templates loaded yet.</em></p>
 {/if}
+
+<div class="spacer" />
+
 <!-- Custom Template Form -->
 {#if isCustom}
   <div class="parameters">
@@ -102,14 +105,17 @@
     </div>
     <div class="form-element">
       <label>Background Color</label>
+      <p>Use color names like "black" or hex like '#121412'</p>
       <input placeholder="Background" bind:value={color} />
     </div>
     <div class="form-element">
       <label>Size</label>
+      <p>Must be formatted thusly: "WxH"</p>
       <input placeholder="Size" bind:value={size} />
     </div>
     <div class="form-element">
       <label>Audio File Type</label>
+      <p>Use the file extension of your input file (ex. "mp3 or wav")</p>
       <input placeholder="Audio Ext" bind:value={audioExt} />
     </div>
     <div class="form-element">
@@ -144,10 +150,12 @@
     </div>
     <div class="form-element">
       <label>Background Color</label>
+      <p>Use color names like "black" or hex like '#121412'</p>
       <input bind:value={selected.color} />
     </div>
     <div class="form-element">
       <label>Size</label>
+      <p>Must be formatted thusly: "WxH"</p>
       <input bind:value={selected.size} />
     </div>
     <div class="form-element">
@@ -156,6 +164,7 @@
     </div>
     <div class="form-element">
       <label>Output Folder Name</label>
+      <p>Use the file extension of your input file (ex. "mp3 or wav")</p>
       <input bind:value={selected.outputFolder} />
     </div>
   </div>
@@ -194,6 +203,10 @@
     align-items: center;
     gap: 2rem;
   }
+
+  :global(p) {
+    margin: 0;
+  }
   .dropzone {
     border: 2px dashed #ccc;
     padding: 1rem;
@@ -201,6 +214,12 @@
     border-radius: 4px;
     min-width: 334px;
     width: 100%;
+  }
+
+  .spacer {
+    height: 1px;
+    background-color: #464646;
+    margin: 1rem 0;
   }
 
   .main-functionality {
@@ -211,8 +230,8 @@
   }
 
   .parameters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
   }
   .form-element input, .form-element select {
@@ -225,6 +244,10 @@
     display: flex;
     flex-direction: column;
     gap: 0.33rem;
+  }
+  .form-element p {
+    font-size: 0.75rem;
+    color: #464646;
   }
 
   .form-element label {
