@@ -28,6 +28,12 @@
     "appId": "com.example.audiotovideoconverter",
     "mac": {
       "target": "dmg"
-    }
+    },
+    "files": [
+      "electron/**/*",     
+      "dist/**/*",          
+      "node_modules/**/*",
+      "package.json"
+    ]
   }
 }

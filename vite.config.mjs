@@ -11,6 +11,7 @@ globalThis.crypto.getRandomValues = (buffer) => {
 };
 
 export default defineConfig({
+  base: './', 
   plugins: [svelte()],
   server: { port: 5173 }
 });

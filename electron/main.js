@@ -20,7 +20,6 @@ function createWindow() {
   });
 
   if (isDev) {
-    console.log('🟢 [main] Loading dev URL');
     // Dev: point at Vite’s dev server
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
