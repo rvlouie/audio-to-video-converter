@@ -145,10 +145,6 @@
 {:else}
   <div class="parameters">
     <div class="form-element">
-      <label>Name</label>
-      <input bind:value={selected.name} />
-    </div>
-    <div class="form-element">
       <label>Background Color</label>
       <p>Use color names like "black" or hex like '#121412'</p>
       <input bind:value={selected.color} />
