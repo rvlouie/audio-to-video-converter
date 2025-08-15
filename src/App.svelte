@@ -146,7 +146,7 @@
   <div class="parameters">
     <div class="form-element">
       <label>Background Color</label>
-      <p>Use color names like "black" or hex like '#121412'</p>
+      <p>Use color names like "black" or hex like "#121412"</p>
       <input bind:value={selected.color} />
     </div>
     <div class="form-element">
@@ -156,11 +156,11 @@
     </div>
     <div class="form-element">
       <label>Audio File Type</label>
+      <p>Use the file extension of your input files (ex. "mp3 or wav")</p>
       <input bind:value={selected.audioExt} />
     </div>
     <div class="form-element">
       <label>Output Folder Name</label>
-      <p>Use the file extension of your input file (ex. "mp3 or wav")</p>
       <input bind:value={selected.outputFolder} />
     </div>
   </div>

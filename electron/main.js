@@ -62,7 +62,7 @@ ipcMain.handle('convert-files', async (event, { files, template }) => {
     try {
       await new Promise((resolve, reject) => {
         ffmpeg()
-          .input(`color=c=${color}:s=${size}:d=10`)
+          .input(`color=c=${color}:s=${size}:d=36000`)
           .inputFormat('lavfi')
           .input(file)
           .outputOptions([
